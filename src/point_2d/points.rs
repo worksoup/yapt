@@ -28,6 +28,7 @@ trait Construct<T> {
     fn new(point_2d: Point<T>) -> Self;
 }
 
+#[macro_export]
 macro_rules! impl_construct_new {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
         impl<$t$(,$other)*> Construct<$t> for $root$(::$idents)*<$t$(,$other)*> {
@@ -37,6 +38,7 @@ macro_rules! impl_construct_new {
         }
     };
 }
+#[macro_export]
 macro_rules! impl_construct_tuple {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
         impl<$t$(,$other)*> Construct<$t> for $root$(::$idents)*<$t$(,$other)*> {
@@ -47,6 +49,7 @@ macro_rules! impl_construct_tuple {
     };
 }
 
+#[macro_export]
 macro_rules! impl_construct_struct {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
         impl<$t$(,$other)*> Construct<$t> for $root$(::$idents)*<$t$(,$other)*> {
@@ -57,6 +60,7 @@ macro_rules! impl_construct_struct {
     };
 }
 
+#[macro_export]
 macro_rules! impl_point2d {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>) => {
         impl<$t$(,$other)*> Point2D<$t> for $root$(::$idents)*<$t$(,$other)*> {
