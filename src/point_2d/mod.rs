@@ -24,6 +24,10 @@ pub mod points;
 
 use std::ops::Deref;
 
+pub trait ConstructFromPoint<T> {
+    fn new(point_2d: Point<T>) -> Self;
+}
+
 pub trait Point2D<T> {
     fn rx(&self) -> &T;
     fn ry(&self) -> &T;
