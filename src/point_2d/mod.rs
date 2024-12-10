@@ -28,9 +28,9 @@ use std::ops::Deref;
 pub trait Point2D<T> {
     fn rx(&self) -> &T;
     fn ry(&self) -> &T;
-    fn into_point_2d(self) -> Point<T>;
-    fn from_point_2d(point_2d: Point<T>) -> Self;
-    fn as_point_2d_ref(&self) -> Point<&T> {
+    fn into_point(self) -> Point<T>;
+    fn from_point(point_2d: Point<T>) -> Self;
+    fn as_ref(&self) -> Point<&T> {
         Point {
             x: self.rx(),
             y: self.ry(),
@@ -60,11 +60,11 @@ impl<T> Point2D<T> for Point<T> {
         &self.y
     }
 
-    fn into_point_2d(self) -> Point<T> {
+    fn into_point(self) -> Point<T> {
         self
     }
 
-    fn from_point_2d(point_2d: Point<T>) -> Self {
+    fn from_point(point_2d: Point<T>) -> Self {
         point_2d
     }
 }
@@ -87,12 +87,6 @@ impl<T: Clone> Point<&T> {
 }
 
 impl<T> Point<T> {
-    pub fn as_ref(&self) -> Point<&T> {
-        Point {
-            x: self.rx(),
-            y: self.ry(),
-        }
-    }
     pub fn as_mut(&mut self) -> Point<&mut T> {
         Point {
             x: &mut self.x,
@@ -107,5 +101,23 @@ impl<T> Point<T> {
             x: &self.x,
             y: &self.y,
         }
+    }
+    pub fn from_point_2d<I>(p: I) -> Self
+    where
+        I: Point2D<T>,
+    {
+        p.into_point()
+    }
+    pub fn into_point_2d<O>(self) -> O
+    where
+        O: Point2D<T>,
+    {
+        O::from_point(self)
+    }
+    pub fn as_point_2d<'a, O>(&'a self) -> O
+    where
+        O: Point2D<&'a T>,
+    {
+        O::from_point(self.as_ref())
     }
 }

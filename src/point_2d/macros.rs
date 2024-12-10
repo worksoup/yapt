@@ -16,14 +16,14 @@ macro_rules! impl_point2d {
                 &self.$y
             }
 
-            fn into_point_2d(self) -> $crate::point_2d::Point<$t2> {
+            fn into_point(self) -> $crate::point_2d::Point<$t2> {
                 $crate::point_2d::Point {
                     x: self.$x,
                     y: self.$y,
                 }
             }
 
-            fn from_point_2d(p: $crate::point_2d::Point<$t2>) -> Self {
+            fn from_point(p: $crate::point_2d::Point<$t2>) -> Self {
                 let xy = impl_point2d!($expr, $t2$(, $xx, $yy)?, $x, $y);
                 xy(p)
             }
