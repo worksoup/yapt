@@ -28,7 +28,7 @@ use crate::{Point, Point2D};
 macro_rules! impl_construct_new {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
         impl<$t$(,$other)*> $crate::point_2d::ConstructFromPoint<$t> for $root$(::$idents)*<$t$(,$other)*> {
-            fn new(point_2d: Point<$t>) -> Self {
+            fn new(point_2d: $crate::point_2d::Point<$t>) -> Self {
                 Self::new($($modifiers)? point_2d.x,$($modifiers)? point_2d.y)
             }
         }
@@ -38,7 +38,7 @@ macro_rules! impl_construct_new {
 macro_rules! impl_construct_tuple {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
         impl<$t$(,$other)*> $crate::point_2d::ConstructFromPoint<$t> for $root$(::$idents)*<$t$(,$other)*> {
-            fn new(point_2d: Point<$t>) -> Self {
+            fn new(point_2d: $crate::point_2d::Point<$t>) -> Self {
                 Self($($modifiers)? point_2d.x,$($modifiers)? point_2d.y)
             }
         }
@@ -49,7 +49,7 @@ macro_rules! impl_construct_tuple {
 macro_rules! impl_construct_struct {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
         impl<$t$(,$other)*> $crate::point_2d::ConstructFromPoint<$t> for $root$(::$idents)*<$t$(,$other)*> {
-            fn new(point_2d: Point<$t>) -> Self {
+            fn new(point_2d: $crate::point_2d::Point<$t>) -> Self {
                 Self{x:$($modifiers)? point_2d.x,y:$($modifiers)? point_2d.y}
             }
         }
@@ -68,14 +68,14 @@ macro_rules! impl_point2d {
                 &self.y
             }
 
-            fn into_point_2d(self) -> Point<$t> {
-                Point {
+            fn into_point_2d(self) -> $crate::point_2d::Point<$t> {
+                $crate::point_2d::Point {
                     x: self.x,
                     y: self.y,
                 }
             }
 
-            fn from_point_2d(point_2d: Point<$t>) -> Self {
+            fn from_point_2d(point_2d: $crate::point_2d::Point<$t>) -> Self {
                 <Self as $crate::point_2d::ConstructFromPoint<T>>::new(point_2d)
             }
         }
