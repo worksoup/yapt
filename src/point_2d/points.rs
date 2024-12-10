@@ -24,14 +24,14 @@
 #![allow(dead_code)]
 use crate::{Point, Point2D};
 
-trait Construct<T> {
+pub trait ConstructFromPoint<T> {
     fn new(point_2d: Point<T>) -> Self;
 }
 
 #[macro_export]
 macro_rules! impl_construct_new {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
-        impl<$t$(,$other)*> Construct<$t> for $root$(::$idents)*<$t$(,$other)*> {
+        impl<$t$(,$other)*> ConstructFromPoint<$t> for $root$(::$idents)*<$t$(,$other)*> {
             fn new(point_2d: Point<$t>) -> Self {
                 Self::new($($modifiers)? point_2d.x,$($modifiers)? point_2d.y)
             }
@@ -41,7 +41,7 @@ macro_rules! impl_construct_new {
 #[macro_export]
 macro_rules! impl_construct_tuple {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
-        impl<$t$(,$other)*> Construct<$t> for $root$(::$idents)*<$t$(,$other)*> {
+        impl<$t$(,$other)*> ConstructFromPoint<$t> for $root$(::$idents)*<$t$(,$other)*> {
             fn new(point_2d: Point<$t>) -> Self {
                 Self($($modifiers)? point_2d.x,$($modifiers)? point_2d.y)
             }
@@ -52,7 +52,7 @@ macro_rules! impl_construct_tuple {
 #[macro_export]
 macro_rules! impl_construct_struct {
     ($root:ident $(:: $idents:ident )*<$t:ident$(,$other:ident)*>$(,$modifiers:tt)?) => {
-        impl<$t$(,$other)*> Construct<$t> for $root$(::$idents)*<$t$(,$other)*> {
+        impl<$t$(,$other)*> ConstructFromPoint<$t> for $root$(::$idents)*<$t$(,$other)*> {
             fn new(point_2d: Point<$t>) -> Self {
                 Self{x:$($modifiers)? point_2d.x,y:$($modifiers)? point_2d.y}
             }
@@ -80,7 +80,7 @@ macro_rules! impl_point2d {
             }
 
             fn from_point_2d(point_2d: Point<$t>) -> Self {
-                <Self as Construct<T>>::new(point_2d)
+                <Self as ConstructFromPoint<T>>::new(point_2d)
             }
         }
     };
