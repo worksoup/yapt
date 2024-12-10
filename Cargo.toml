@@ -37,3 +37,4 @@ default = []
 [dependencies]
 rxing = { version = "*", optional = true }
 imageproc = { version = "*", optional = true }
+euclid = { version = "*", optional = true }
