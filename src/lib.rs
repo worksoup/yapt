@@ -20,6 +20,4 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-mod point_2d;
-
-pub use point_2d::*;
+pub mod point_2d;
