@@ -30,3 +30,8 @@ impl_point2d!(imageproc::point::Point<T>, s, s);
 
 #[cfg(feature = "euclid")]
 impl_point2d!(euclid::Point2D<T, U>, s, n);
+
+#[cfg(feature = "core-graphics")]
+use core_graphics::base::CGFloat;
+#[cfg(feature = "core-graphics")]
+impl_point2d!(impl Trait<CGFloat> for core_graphics::geometry::CGPoint, x, y, s);

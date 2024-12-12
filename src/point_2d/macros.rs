@@ -6,8 +6,8 @@ macro_rules! impl_point2d {
     ($root:ident $(:: $idents:ident )*<$t:ident$(, $other:ident)*>,s, $expr:tt$(, $xx:tt, $yy:tt)?) => {
         impl_point2d!($root$(::$idents)*<$t$(,$other)*>,x,y,$expr$(, $xx, $yy)?);
     };
-    (impl <$t1:ident$(, $other1:ident)*> Trait<$t2:ident> for $root:ident $(:: $idents:ident )*<$t3:ident$(, $other2:ident)*> $(where {$($case:tt)?*})?, $x:tt, $y:tt, $expr:tt$(, $xx:tt, $yy:tt)?) => {
-        impl<$t1$(,$other1)*> $crate::point_2d::Point2D<$t2> for $root$(::$idents)*<$t3$(,$other2)*> $(where $($case)?*)?{
+    (impl $(<$t1:ident$(, $other1:ident)*>)? Trait<$t2:ident> for $root:ident $(:: $idents:ident )*$(<$t3:ident$(, $other2:ident)*>)?$(where {$($case:tt)?*})?, $x:tt, $y:tt, $expr:tt$(, $xx:tt, $yy:tt)?) => {
+        impl$(<$t1$(,$other1)*>)? $crate::point_2d::Point2D<$t2> for $root$(::$idents)*$(<$t3$(,$other2)*>)?$(where $($case)?*)?{
             fn rx(&self) -> &$t2 {
                 &self.$x
             }

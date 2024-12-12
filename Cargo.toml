@@ -38,3 +38,4 @@ default = []
 rxing = { version = "*", optional = true }
 imageproc = { version = "*", optional = true }
 euclid = { version = "*", optional = true }
+core-graphics = { version = "*", optional = true }
