@@ -8,21 +8,22 @@ macro_rules! impl_point2d {
     };
     (impl $(<$t1:ident$(, $other1:ident)*>)? Trait<$t2:ident> for $root:ident $(:: $idents:ident )*$(<$t3:ident$(, $other2:ident)*>)?$(where {$($case:tt)?*})?, $x:tt, $y:tt, $expr:tt$(, $xx:tt, $yy:tt)?) => {
         impl$(<$t1$(,$other1)*>)? $crate::point_2d::Point2D<$t2> for $root$(::$idents)*$(<$t3$(,$other2)*>)?$(where $($case)?*)?{
+            #[inline]
             fn rx(&self) -> &$t2 {
                 &self.$x
             }
-
+            #[inline]
             fn ry(&self) -> &$t2 {
                 &self.$y
             }
-
+            #[inline]
             fn into_point(self) -> $crate::point_2d::Point<$t2> {
                 $crate::point_2d::Point {
                     x: self.$x,
                     y: self.$y,
                 }
             }
-
+            #[inline]
             fn from_point(p: $crate::point_2d::Point<$t2>) -> Self {
                 let xy = impl_point2d!($expr, $t2$(, $xx, $yy)?, $x, $y);
                 xy(p)
