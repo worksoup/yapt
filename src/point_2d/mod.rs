@@ -23,9 +23,10 @@
 mod macros;
 pub mod points;
 
+use num_traits::{Num, NumCast};
 use std::{
     iter::FusedIterator,
-    ops::{Deref, DerefMut},
+    ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign},
 };
 
 /// 所有类似的二维点类型都应当实现该 trait.
@@ -39,6 +40,7 @@ pub trait Point2D<T> {
     /// 通过内建 [`Point`] 类型构造。
     fn from_point(point_2d: Point<T>) -> Self;
     /// 使用 x, y 坐标的引用构造内建 [`Point`] 类型。
+    #[inline]
     fn as_point(&self) -> Point<&T> {
         Point {
             x: self.rx(),
@@ -117,49 +119,158 @@ impl<T> Point2D<T> for Point<T> {
         point_2d
     }
 }
-impl<T> Point<&T> {
+
+pub trait CopiedPoint<T>
+where
+    T: Copy,
+{
+    fn copied(&self) -> Point<T>;
+}
+impl<T> CopiedPoint<T> for Point<&T>
+where
+    T: Copy,
+{
     #[inline]
-    pub fn copied(&self) -> Point<T>
-    where
-        T: Copy,
-    {
+    fn copied(&self) -> Point<T> {
         Point {
             x: *self.x,
             y: *self.y,
         }
     }
+}
+impl<T> CopiedPoint<T> for Point<&mut T>
+where
+    T: Copy,
+{
     #[inline]
-    pub fn cloned(&self) -> Point<T>
-    where
-        T: Clone,
-    {
+    fn copied(&self) -> Point<T> {
+        self.as_immut().copied()
+    }
+}
+impl<T> CopiedPoint<T> for &Point<T>
+where
+    T: Copy,
+{
+    #[inline]
+    fn copied(&self) -> Point<T> {
+        **self
+    }
+}
+impl<T> CopiedPoint<T> for Point<T>
+where
+    T: Copy,
+{
+    #[inline]
+    fn copied(&self) -> Point<T> {
+        *self
+    }
+}
+pub trait PassPoint<T> {
+    fn pass(self) -> Point<T>;
+}
+impl<T> PassPoint<T> for Point<T> {
+    #[inline]
+    fn pass(self) -> Point<T> {
+        self
+    }
+}
+impl<T> PassPoint<T> for Point<&T>
+where
+    T: Copy,
+{
+    #[inline]
+    fn pass(self) -> Point<T> {
+        self.copied()
+    }
+}
+impl<T> PassPoint<T> for Point<&mut T>
+where
+    T: Copy,
+{
+    #[inline]
+    fn pass(self) -> Point<T> {
+        self.copied()
+    }
+}
+impl<T> PassPoint<T> for &Point<T>
+where
+    T: Copy,
+{
+    #[inline]
+    fn pass(self) -> Point<T> {
+        self.copied()
+    }
+}
+pub trait ClonedPoint<T>
+where
+    T: Clone,
+{
+    fn cloned(&self) -> Point<T>;
+}
+impl<T> ClonedPoint<T> for Point<&T>
+where
+    T: Clone,
+{
+    #[inline]
+    fn cloned(&self) -> Point<T> {
         Point {
             x: self.x.clone(),
             y: self.y.clone(),
         }
     }
 }
-
+impl<T> ClonedPoint<T> for Point<&mut T>
+where
+    T: Clone,
+{
+    #[inline]
+    fn cloned(&self) -> Point<T> {
+        self.as_immut().cloned()
+    }
+}
+impl<T> ClonedPoint<T> for &Point<T>
+where
+    T: Clone,
+{
+    #[inline]
+    fn cloned(&self) -> Point<T> {
+        (*self).clone()
+    }
+}
+impl<T> ClonedPoint<T> for Point<T>
+where
+    T: Clone,
+{
+    #[inline]
+    fn cloned(&self) -> Point<T> {
+        (*self).clone()
+    }
+}
 impl<T> Point<&mut T> {
     #[inline]
-    pub fn copied(&self) -> Point<T>
-    where
-        T: Copy,
-    {
+    pub fn as_immut(&self) -> Point<&T> {
         Point {
-            x: *self.x,
-            y: *self.y,
+            x: self.x,
+            y: self.y,
         }
     }
     #[inline]
-    pub fn cloned(&self) -> Point<T>
+    pub fn sub_assign<U: PassPoint<T>>(&mut self, rhs: U)
     where
-        T: Clone,
+        T: SubAssign,
     {
-        Point {
-            x: self.x.clone(),
-            y: self.y.clone(),
-        }
+        let rhs = rhs.pass();
+        *self.x -= rhs.x;
+        *self.y -= rhs.y;
+    }
+    #[inline]
+    pub fn add_assign<U: PassPoint<T>>(&mut self, rhs: U)
+    where
+        T: AddAssign,
+    {
+        let rhs = rhs.pass();
+        *self.x += rhs.x;
+        *self.y += rhs.y;
     }
 }
 impl<T> Point<Option<T>> {
@@ -209,6 +320,10 @@ impl<T, U> Point<(T, U)> {
     }
 }
 impl<T> Point<T> {
+    #[inline]
+    pub fn new(x: T, y: T) -> Point<T> {
+        Point::<T> { x, y }
+    }
     #[inline]
     pub const fn as_ref(&self) -> Point<&T> {
         Point {
@@ -454,3 +569,52 @@ impl<A> ExactSizeIterator for IntoIter<A> {}
 impl<A> FusedIterator for IntoIter<A> {}
 
 // unsafe impl<A> TrustedLen for IntoIter<A> {}
+
+impl<T: Num, U: PassPoint<T>> Add<U> for Point<T> {
+    type Output = Self;
+    #[inline]
+    fn add(self, other: U) -> Point<T> {
+        let other = other.pass();
+        (self.x + other.x, self.y + other.y).into_point()
+    }
+}
+impl<T: Num + AddAssign<T>, U: PassPoint<T>> AddAssign<U> for Point<T> {
+    #[inline]
+    fn add_assign(&mut self, rhs: U) {
+        let rhs = rhs.pass();
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+impl<T: Num, U: PassPoint<T>> Sub<U> for Point<T> {
+    type Output = Self;
+    #[inline]
+    fn sub(self, other: U) -> Point<T> {
+        let other = other.pass();
+        (self.x - other.x, self.y - other.y).into_point()
+    }
+}
+/// 暂时无法为 `Point<&mut T>` 实现 `SubAssign`.
+/// 故将其放在成员函数当中。
+impl<T: Num + SubAssign<T>, U: PassPoint<T>> SubAssign<U> for Point<T> {
+    #[inline]
+    fn sub_assign(&mut self, rhs: U) {
+        let rhs = rhs.pass();
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+    }
+}
+/// 两点之间的直线距离。
+pub fn distance<T: NumCast>(a: Point<T>, b: Point<T>) -> f64 {
+    distance_sq_f64(a, b).sqrt()
+}
+/// 两点之间直线距离的平方。
+pub fn distance_sq_f64<T: NumCast>(a: Point<T>, b: Point<T>) -> f64 {
+    let p = a.map(|num| num.to_f64().unwrap());
+    let q = b.map(|num| num.to_f64().unwrap());
+    (p.x - q.x).powf(2.0) + (p.y - q.y).powf(2.0)
+}
+/// 两点之间直线距离的平方。
+pub fn distance_sq<T: Num + Copy>(p: Point<T>, q: Point<T>) -> T {
+    (p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y)
+}

@@ -35,6 +35,7 @@ repository = "https://github.com/worksoup/yapt"
 default = []
 
 [dependencies]
+num-traits = "0.2"
 rxing = { version = "*", optional = true }
 imageproc = { version = "*", optional = true }
 euclid = { version = "*", optional = true }
