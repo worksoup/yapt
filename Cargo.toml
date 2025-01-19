@@ -40,3 +40,6 @@ rxing = { version = "*", optional = true }
 imageproc = { version = "*", optional = true }
 euclid = { version = "*", optional = true }
 core-graphics = { version = "*", optional = true }
+windows = { version = "*", optional = true }
+glam = { version = "*", optional = true }
+ttf-parser = { version = "*", optional = true }
